@@ -4,5 +4,6 @@ namespace WebBackend.Model.Manager;
 
 public interface IAuthManager
 {
-    Task<bool> TryAuthenticate(AuthenticateDto dto);
+    Task<string> TryAuthenticate(LoginDto dto);
+    string CreateWebToken();
 }

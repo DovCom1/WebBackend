@@ -4,5 +4,5 @@ namespace WebBackend.Model.Service;
 
 public interface IAuthService
 {
-    Task<bool> SendAsync(AuthenticateDto dto);
+    Task<AuthTokenDto?> SendAsync(AuthenticateDto dto);
 }

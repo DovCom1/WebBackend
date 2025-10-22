@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
+using WebBackend.Api.Service;
 using WebBackend.Model.Dto;
 using WebBackend.Model.Manager;
+ 
 
 namespace WebBackend.Api.Controllers;
 
@@ -17,13 +19,12 @@ public class AuthController(
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
         
-        var status = await authManager.TryAuthenticate();
-        if (!status)
-        {
-            return BadRequest();
-        }
+        var sid = await _authManager.TryAuthenticate(dto);
+        CookieCreator.AddSidToCookie(sid, Response);
 
-        return Created();
+        var webToken = _authManager.CreateWebToken();
+        
+        return Ok(new WebTokenDto(webToken));
     }
 
     // [HttpPost("register")]
