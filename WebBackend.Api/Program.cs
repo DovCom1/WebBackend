@@ -3,7 +3,8 @@ using WebBackend.Service.DependencyInjection;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
-builder.Services.AddInfrastructure();
+
+builder.Services.AddInfrastructure(builder.Configuration);
 
 if (builder.Environment.IsDevelopment())
 {

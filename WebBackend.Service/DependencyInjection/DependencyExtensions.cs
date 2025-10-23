@@ -1,17 +1,27 @@
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StackExchange.Redis;
 using WebBackend.Model.Manager;
 using WebBackend.Model.Service;
+using WebBackend.Model.Storage;
 using WebBackend.Service.Manager;
 using WebBackend.Service.Service;
+using WebBackend.Service.Storage;
 
 namespace WebBackend.Service.DependencyInjection;
 
 public static class DependencyExtensions
 {
-    public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+    public static IServiceCollection AddInfrastructure(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
+        var connectionString = configuration["RedisConnection:ConnectionString"] 
+                               ?? throw new NullReferenceException("No connection string cache");
+        var connectionPassword = configuration["RedisConnection:Password"] 
+                                 ??  throw new NullReferenceException("No connection password");
         return services
-            .AddStorages()
+            .AddStorages(connectionString, connectionPassword)
             .AddServices()
             .AddManagers();
     }
@@ -22,9 +32,20 @@ public static class DependencyExtensions
             .AddSingleton<IGeneratorService, GeneratorService>();
     }
 
-    private static IServiceCollection AddStorages(this IServiceCollection services)
+    private static IServiceCollection AddStorages(
+        this IServiceCollection services, 
+        string connectionString, 
+        string connectionPassword)
     {
-        return services;
+        return services
+            .AddSingleton<IConnectionMultiplexer>(_ =>
+        {
+            var options = ConfigurationOptions.Parse(connectionString);
+            if (!string.IsNullOrWhiteSpace(connectionString)) options.Password = connectionPassword;
+            options.AbortOnConnectFail = false;
+            return ConnectionMultiplexer.Connect(options);
+        })
+            .AddSingleton<ISessionStorage, RedisSessionStorage>();
     }
 
     private static IServiceCollection AddManagers(this IServiceCollection services)
