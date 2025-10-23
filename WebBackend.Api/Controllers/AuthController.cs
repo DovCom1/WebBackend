@@ -27,9 +27,13 @@ public class AuthController(
         return Ok(new WebTokenDto(webToken));
     }
 
-    // [HttpPost("register")]
-    // public async Task<IActionResult> Register([FromBody] RegisterDto dto)
-    // {
-    //     
-    // }
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterDto dto)
+    {
+        if (await _authManager.TryRegister(dto))
+        {
+            return Created();
+        }
+        return BadRequest();
+    }
 }

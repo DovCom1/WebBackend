@@ -16,10 +16,15 @@ public class AuthManager(
     private readonly ISessionStorage _sessionStorage = sessionStorage;
     public async Task<string> TryAuthenticate(LoginDto dto)
     {
-        var tokens = await _authService.SendAsync(dto.ToAuthenticateDto());
+        var tokens = await _authService.LoginAsync(dto.ToAuthenticateDto());
         var sid = _generatorService.GenerateSid();
         await _sessionStorage.AddSession(sid, tokens!.Token);
         return sid;
+    }
+
+    public async Task<bool> TryRegister(RegisterDto dto)
+    {
+        return await _authService.RegisterAsync(dto.ToAuthenticateDto());
     }
 
     public string CreateWebToken()
