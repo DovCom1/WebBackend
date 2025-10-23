@@ -45,11 +45,11 @@ public static class DependencyExtensions
             options.AbortOnConnectFail = false;
             return ConnectionMultiplexer.Connect(options);
         })
-            .AddSingleton<ISessionStorage, RedisSessionStorage>();
+            .AddScoped<ISessionStorage, RedisSessionStorage>();
     }
 
     private static IServiceCollection AddManagers(this IServiceCollection services)
     {
-        return services.AddSingleton<IAuthManager, AuthManager>();
+        return services.AddScoped<IAuthManager, AuthManager>();
     }
 }
