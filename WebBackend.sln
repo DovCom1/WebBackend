@@ -9,8 +9,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBackend.Model", "WebBack
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBackend.Service", "WebBackend.Service\WebBackend.Service.csproj", "{86CB7CE4-A122-41BC-911F-1180246E5BF2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebBackend.Infrastructure", "WebBackend.Infrastructure\WebBackend.Infrastructure.csproj", "{B41D1098-2647-4E60-BD55-2E28082A3964}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -32,9 +30,5 @@ Global
 		{86CB7CE4-A122-41BC-911F-1180246E5BF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86CB7CE4-A122-41BC-911F-1180246E5BF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86CB7CE4-A122-41BC-911F-1180246E5BF2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B41D1098-2647-4E60-BD55-2E28082A3964}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B41D1098-2647-4E60-BD55-2E28082A3964}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B41D1098-2647-4E60-BD55-2E28082A3964}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B41D1098-2647-4E60-BD55-2E28082A3964}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
