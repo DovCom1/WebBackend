@@ -20,37 +20,50 @@ public static class DependencyExtensions
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        var connectionString = configuration["RedisConnection:ConnectionString"] 
-                               ?? throw new NullReferenceException("No connection string cache");
-        var connectionPassword = configuration["RedisConnection:Password"] 
-                                 ??  throw new NullReferenceException("No connection password");
         return services
-            .AddStorages(connectionString, connectionPassword)
+            .AddConfiguration(configuration)
+            .AddStorages(configuration)
             .AddServices()
             .AddManagers()
-            .AddWebBackendServices(configuration);
+            .AddHttpClients()
+            .AddCorsConfiguration(configuration);
     }
 
-    private static IServiceCollection AddServices(this  IServiceCollection services)
+    private static IServiceCollection AddConfiguration(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.Configure<ConductorConfig>(configuration.GetSection("Conductor"));
+        services.Configure<CorsConfig>(configuration.GetSection("Cors"));
+
+        return services;
+    }
+
+    private static IServiceCollection AddServices(this IServiceCollection services)
     {
         return services.AddSingleton<IAuthService, AuthService>()
             .AddSingleton<IGeneratorService, GeneratorService>()
-            .AddScoped<IConductorService, ConductorService>();;
+            .AddScoped<IConductorService, ConductorService>();
+        ;
     }
 
     private static IServiceCollection AddStorages(
-        this IServiceCollection services, 
-        string connectionString, 
-        string connectionPassword)
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
+        var connectionString = configuration["RedisConnection:ConnectionString"]
+                               ?? throw new NullReferenceException("No connection string cache");
+        var connectionPassword = configuration["RedisConnection:Password"]
+                                 ?? throw new NullReferenceException("No connection password");
+
         return services
             .AddSingleton<IConnectionMultiplexer>(_ =>
-        {
-            var options = ConfigurationOptions.Parse(connectionString);
-            if (!string.IsNullOrWhiteSpace(connectionString)) options.Password = connectionPassword;
-            options.AbortOnConnectFail = false;
-            return ConnectionMultiplexer.Connect(options);
-        })
+            {
+                var options = ConfigurationOptions.Parse(connectionString);
+                if (!string.IsNullOrWhiteSpace(connectionString)) options.Password = connectionPassword;
+                options.AbortOnConnectFail = false;
+                return ConnectionMultiplexer.Connect(options);
+            })
             .AddScoped<ISessionStorage, RedisSessionStorage>();
     }
 
@@ -58,12 +71,9 @@ public static class DependencyExtensions
     {
         return services.AddScoped<IAuthManager, AuthManager>();
     }
-    
-    public static IServiceCollection AddWebBackendServices(this IServiceCollection services, IConfiguration configuration)
+
+    private static IServiceCollection AddHttpClients(this IServiceCollection services)
     {
-        services.Configure<ConductorConfig>(configuration.GetSection("Conductor"));
-        services.Configure<CorsConfig>(configuration.GetSection("Cors"));
-        
         services.AddHttpClient<IConductorService, ConductorService>((provider, client) =>
         {
             var config = provider.GetRequiredService<IOptions<ConductorConfig>>().Value;
@@ -71,18 +81,24 @@ public static class DependencyExtensions
             client.DefaultRequestHeaders.Add("Accept", "application/json");
         });
 
-        // CORS
-        var corsConfig = configuration.GetSection("Cors").Get<CorsConfig>() ?? new CorsConfig();;
+        return services;
+    }
+
+    private static IServiceCollection AddCorsConfiguration(this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var corsConfig = configuration.GetSection("Cors").Get<CorsConfig>() ?? new CorsConfig();
+        ;
         services.AddCors(options =>
         {
             options.AddDefaultPolicy(policy =>
             {
                 policy.WithOrigins(corsConfig.AllowedOrigins)
-                      .WithMethods(corsConfig.AllowedMethods)
-                      .AllowCredentials();
+                    .WithMethods(corsConfig.AllowedMethods)
+                    .AllowCredentials();
             });
         });
-        
+
         return services;
     }
 }

@@ -2,7 +2,7 @@
 
 public class ConductorRequest
 {
-    public required string Method { get; set; }
+    public required HttpMethod Method { get; set; }
     public required string Service { get; set; }
     public required string Endpoint { get; set; }
     public object? Data { get; set; }

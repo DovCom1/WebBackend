@@ -48,7 +48,7 @@ public class ConductorService : IConductorService
     private HttpRequestMessage CreateHttpRequest(ConductorRequest request)
     {
         var url = $"{_config.BaseUrl}/api/{request.Service}/{request.Endpoint.TrimStart('/')}";
-        var httpRequest = new HttpRequestMessage(new HttpMethod(request.Method), url);
+        var httpRequest = new HttpRequestMessage(request.Method, url);
         
         if (request.Data is not null)
         {
