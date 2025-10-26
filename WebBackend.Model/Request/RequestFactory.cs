@@ -24,6 +24,7 @@ public class RequestFactory(IOptions<RequestDomains> options)
     public HttpRequestMessage CreateRegisterRequest(AuthenticateDto dto)
     {
         var json = JsonSerializer.Serialize(dto);
+        Console.WriteLine("auth service is " + _requestDomains.AuthService);
         return new HttpRequestMessage(
             HttpMethod.Post,
             _requestDomains.AuthService + RequestPath.RegisterUrl)

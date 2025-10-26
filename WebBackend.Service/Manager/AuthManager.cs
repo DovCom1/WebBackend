@@ -9,17 +9,21 @@ namespace WebBackend.Service.Manager;
 public class AuthManager(
     IAuthService authService,
     IGeneratorService generatorService,
-    ISessionStorage sessionStorage) : IAuthManager
+    ISessionStorage sessionStorage,
+    IWebTokenStorage webTokenStorage) : IAuthManager
 {
     private readonly IAuthService _authService = authService;
     private readonly IGeneratorService _generatorService = generatorService;
     private readonly ISessionStorage _sessionStorage = sessionStorage;
-    public async Task<string> TryAuthenticate(LoginDto dto)
+    private readonly IWebTokenStorage _webTokenStorage = webTokenStorage;
+    public async Task<(string, string)> TryAuthenticate(LoginDto dto)
     {
         var tokens = await _authService.LoginAsync(dto.ToAuthenticateDto());
         var sid = _generatorService.GenerateSid();
         await _sessionStorage.AddSession(sid, tokens!.Token);
-        return sid;
+        var webToken = CreateWebToken();
+        _webTokenStorage.SaveWebToken(sid, webToken);
+        return (sid, webToken);
     }
 
     public async Task<bool> TryRegister(RegisterDto dto)
@@ -30,5 +34,14 @@ public class AuthManager(
     public string CreateWebToken()
     {
         return _generatorService.GenerateWebToken();
+    }
+
+    public bool VerifyToken(string webToken)
+    {
+        if (_webTokenStorage.WebTokenIsExists(webToken))
+        {
+            return true;
+        }
+        return false;
     }
 }

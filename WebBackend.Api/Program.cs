@@ -12,13 +12,21 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddSwaggerGen();
 }
 
-var app =  builder.Build();
+var app = builder.Build();
+app.UseRouting();
+app.UseCors("frontend");
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseWebSockets(new  WebSocketOptions
+{
+    KeepAliveInterval = TimeSpan.FromSeconds(30),
+    ReceiveBufferSize = 4 * 1024
+});
 
 app.MapControllers();
 app.Run();

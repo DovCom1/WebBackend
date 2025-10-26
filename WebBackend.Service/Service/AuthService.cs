@@ -11,8 +11,9 @@ public class AuthService(IHttpClientFactory clientFactory, RequestFactory reques
     private readonly RequestFactory _requestFactory = requestFactory;
     public async Task<AuthTokenDto?> LoginAsync(AuthenticateDto dto)
     {
-        var client = _clientFactory.CreateClient("AuthService");
-        var response = await client.SendAsync(_requestFactory.CreateLoginRequest(dto));
+        var client = _clientFactory.CreateClient();
+        var request = _requestFactory.CreateLoginRequest(dto);
+        var response = await client.SendAsync(request);
         if (response.IsSuccessStatusCode)
         {
             return JsonSerializer.Deserialize<AuthTokenDto>(await response.Content.ReadAsStringAsync());
@@ -22,7 +23,7 @@ public class AuthService(IHttpClientFactory clientFactory, RequestFactory reques
 
     public async Task<bool> RegisterAsync(AuthenticateDto dto)
     {
-        var client = _clientFactory.CreateClient("AuthService");
+        var client = _clientFactory.CreateClient();
         var response = await client.SendAsync(_requestFactory.CreateRegisterRequest(dto));
         return response.IsSuccessStatusCode;
     }
