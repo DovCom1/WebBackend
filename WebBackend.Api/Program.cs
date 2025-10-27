@@ -13,7 +13,6 @@ if (builder.Environment.IsDevelopment())
 }
 
 var app = builder.Build();
-app.UseRouting();
 app.UseCors("frontend");
 
 if (app.Environment.IsDevelopment())
@@ -24,8 +23,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseWebSockets(new  WebSocketOptions
 {
-    KeepAliveInterval = TimeSpan.FromSeconds(30),
-    ReceiveBufferSize = 4 * 1024
+    KeepAliveInterval = TimeSpan.FromSeconds(30)
 });
 
 app.MapControllers();

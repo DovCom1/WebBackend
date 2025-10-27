@@ -7,7 +7,6 @@ using WebBackend.Model.Storage;
 using WebBackend.Service.Manager;
 using WebBackend.Service.Service;
 using WebBackend.Service.Storage;
-using WebBackend.Model.Configs;
 using WebBackend.Model.Request;
 
 
@@ -49,7 +48,6 @@ public static class DependencyExtensions
             var options = ConfigurationOptions.Parse(connectionString);
             if (!string.IsNullOrWhiteSpace(connectionString)) options.Password = connectionPassword;
             options.AbortOnConnectFail = false;
-            Console.WriteLine("OPTIONS PASSWORD " + options.Password);
             return ConnectionMultiplexer.Connect(options);
         })
             .AddScoped<ISessionStorage, RedisSessionStorage>()
@@ -72,17 +70,13 @@ public static class DependencyExtensions
     private static IServiceCollection AddCorsConfiguration(this IServiceCollection services,
         IConfiguration configuration)
     {
-        var corsConfig = configuration.GetSection("Cors").Get<CorsConfig>() ?? new CorsConfig();
-        ;
         services.AddCors(options =>
         {
             options.AddPolicy("frontend", p => p
-                .WithOrigins(
-                    "http://localhost:3000",
-                    "http://127.0.0.1:3000")
-                .AllowAnyHeader()                      // Content-Type, Authorization и т.п.
-                .AllowAnyMethod()                      // GET/POST/PUT/DELETE/OPTIONS
-                .AllowCredentials()                    // если нужны куки/авторизация
+                .WithOrigins("http://localhost:3000")
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()
                 .SetPreflightMaxAge(TimeSpan.FromHours(1))
             );
         });

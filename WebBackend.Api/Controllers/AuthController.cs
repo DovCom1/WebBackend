@@ -39,13 +39,16 @@ public class AuthController(
     }
 
     [HttpGet("connect")]
-    public async Task CreateWebSocket([FromQuery] string webToken)
+    public async Task CreateWebSocket([FromQuery] string token)
     {
-        if (!HttpContext.WebSockets.IsWebSocketRequest && _authManager.VerifyToken(webToken))
+        _logger.LogInformation("Connect websocket to token");
+        if (!HttpContext.WebSockets.IsWebSocketRequest && !_authManager.VerifyToken(token))
         {
+            _logger.LogWarning("Failed to connect the socket");
             HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
             return;
         }
+        _logger.LogInformation("Token is valid; request is websocket request");
 
         using var socket = await HttpContext.WebSockets.AcceptWebSocketAsync();
 
@@ -71,11 +74,5 @@ public class AuthController(
 
             await socket.SendAsync(replyBytes, WebSocketMessageType.Text, true, CancellationToken.None);
         }
-    }
-
-    [HttpPost("hello")]
-    public IActionResult Hello()
-    {
-        return Ok("Hello world");
     }
 }
