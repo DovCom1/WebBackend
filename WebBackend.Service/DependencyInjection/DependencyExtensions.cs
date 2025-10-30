@@ -11,6 +11,7 @@ using WebBackend.Service.Manager;
 using WebBackend.Service.Service;
 using WebBackend.Service.Storage;
 using Microsoft.AspNetCore.Cors;
+using WebBackend.Model.Request;
 
 namespace WebBackend.Service.DependencyInjection;
 
@@ -22,11 +23,12 @@ public static class DependencyExtensions
     {
         return services
             .AddConfiguration(configuration)
-            .AddStorages(configuration)
+            //.AddStorages(configuration)
             .AddServices()
             .AddManagers()
             .AddHttpClients()
-            .AddCorsConfiguration(configuration);
+            .AddCorsConfiguration(configuration)
+            .AddScoped<ISessionStorage, RedisSessionStorage>();
     }
 
     private static IServiceCollection AddConfiguration(
@@ -34,6 +36,7 @@ public static class DependencyExtensions
         IConfiguration configuration)
     {
         services.Configure<ConductorConfig>(configuration.GetSection("Conductor"));
+        services.Configure<AuthConfig>(configuration.GetSection("RequestDomains:AuthService"));
         services.Configure<CorsConfig>(configuration.GetSection("Cors"));
 
         return services;
@@ -41,10 +44,11 @@ public static class DependencyExtensions
 
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
-        return services.AddSingleton<IAuthService, AuthService>()
+        return services
             .AddSingleton<IGeneratorService, GeneratorService>()
-            .AddScoped<IConductorService, ConductorService>();
-        ;
+            .AddScoped<IConductorService, ConductorService>()
+            .AddSingleton<IAuthService, AuthService>()
+            .AddSingleton<RequestFactory>();
     }
 
     private static IServiceCollection AddStorages(
@@ -75,6 +79,13 @@ public static class DependencyExtensions
     private static IServiceCollection AddHttpClients(this IServiceCollection services)
     {
         services.AddHttpClient<IConductorService, ConductorService>((provider, client) =>
+        {
+            var config = provider.GetRequiredService<IOptions<ConductorConfig>>().Value;
+            client.BaseAddress = new Uri(config.BaseUrl);
+            client.DefaultRequestHeaders.Add("Accept", "application/json");
+        });
+
+        services.AddHttpClient("AuthService", (provider, client) =>
         {
             var config = provider.GetRequiredService<IOptions<ConductorConfig>>().Value;
             client.BaseAddress = new Uri(config.BaseUrl);
