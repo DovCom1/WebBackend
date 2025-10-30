@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using WebBackend.Api.Service;
 using WebBackend.Model.Dto;
 using WebBackend.Model.Manager;
- 
 
 namespace WebBackend.Api.Controllers;
 
