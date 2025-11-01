@@ -1,6 +1,5 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using StackExchange.Redis;
+using WebBackend.Model.Configuration;
 using WebBackend.Model.Manager;
 using WebBackend.Model.Service;
 using WebBackend.Model.Storage;
@@ -56,7 +55,9 @@ public static class DependencyExtensions
 
     private static IServiceCollection AddManagers(this IServiceCollection services)
     {
-        return services.AddScoped<IAuthManager, AuthManager>();
+        return services
+            .AddScoped<IAuthManager, AuthManager>()
+            .AddScoped<ITokenManager, TokenManager>();
     }
 
     private static IServiceCollection AddHttpClientFactory(this IServiceCollection services)
@@ -89,6 +90,8 @@ public static class DependencyExtensions
         IConfiguration configuration)
     {
         return services
-            .Configure<RequestDomains>(configuration.GetSection("RequestDomains"));
+            .Configure<RequestDomains>(configuration.GetSection("RequestDomains"))
+            .Configure<SecretKeys>(configuration.GetSection("SecretKeys"))
+            .Configure<RedisConnection>(configuration.GetSection("RedisConnection"));
     }
 }

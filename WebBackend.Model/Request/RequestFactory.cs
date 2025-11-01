@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
+using WebBackend.Model.Configuration;
 using WebBackend.Model.Dto;
 
 namespace WebBackend.Model.Request;
