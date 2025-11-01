@@ -12,7 +12,7 @@ public class RedisSessionStorage(IConnectionMultiplexer multiplexer) : ISessionS
         return await _database.StringSetAsync(sessionId, token, RedisConstants.Ttl);
     }
 
-    public async Task<string?> GetSession(string sessionId)
+    public async Task<string?> GetAccessToken(string sessionId)
     {
         return await _database.StringGetAsync(sessionId);
     }

@@ -6,5 +6,5 @@ public interface IAuthManager
 {
     Task<(string, string)> TryAuthenticate(LoginDto dto);
     Task<bool> TryRegister(RegisterDto dto);
-    bool VerifyToken(string token);
+    // bool VerifyToken(string token);
 }

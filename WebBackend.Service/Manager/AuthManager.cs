@@ -35,13 +35,4 @@ public class AuthManager(
     {
         return _generatorService.GenerateWebToken();
     }
-
-    public bool VerifyToken(string webToken)
-    {
-        if (_webTokenStorage.WebTokenIsExists(webToken))
-        {
-            return true;
-        }
-        return false;
-    }
 }

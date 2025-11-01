@@ -10,7 +10,7 @@ using WebBackend.Service.Storage;
 using WebBackend.Model.Request;
 
 
-namespace WebBackend.Service.DependencyInjection;
+namespace WebBackend.Api.Extensions;
 
 public static class DependencyExtensions
 {

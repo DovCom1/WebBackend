@@ -10,14 +10,13 @@ public class WebTokenStorage : IWebTokenStorage
         _tokens[token] = sid;
     }
 
-    public bool WebTokenIsExists(string token)
+    public bool TryGetSid(string token,  out string sid)
     {
-        if (_tokens.TryGetValue(token, out var sid))
+        if (_tokens.TryGetValue(token, out sid))
         {
             DeleteWebToken(token);
             return true;
         }
-
         return false;
     }
 
