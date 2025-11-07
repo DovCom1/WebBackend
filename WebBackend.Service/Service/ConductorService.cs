@@ -1,5 +1,7 @@
-﻿using System.Text;
+﻿using System.Net.Http;
+using System.Text;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using WebBackend.Model.Configuration;
 using WebBackend.Model.Request;
@@ -7,35 +9,23 @@ using WebBackend.Model.Service;
 
 namespace WebBackend.Service.Service;
 
-public class ConductorService : IConductorService
+public class ConductorService(
+    IHttpClientFactory clientFactory,
+    RequestFactory requestFactory,
+    ILogger<AuthService> logger) : IConductorService
 {
-    private readonly HttpClient _httpClient;
-    private readonly ConductorConfig _config;
-    private readonly JsonSerializerOptions _jsonOptions;
-
-    public ConductorService(HttpClient httpClient, IOptions<ConductorConfig> config)
-    {
-        _httpClient = httpClient;
-        _config = config.Value;
-        
-        _jsonOptions = new JsonSerializerOptions
-        {
-            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-            WriteIndented = false
-        };
-    }
-
     public async Task<ConductorResponse> SendAsync(ConductorRequest request)
     {
         try
         {
-            var httpRequest = CreateHttpRequest(request);
-            var response = await _httpClient.SendAsync(httpRequest);
+            var httpClient = clientFactory.CreateClient();
+            var response = await httpClient.SendAsync(requestFactory.CreateHttpRequestAsync(request));
             
             return await CreateConductorResponse(response);
         }
         catch (Exception ex)
         {
+            logger.LogError($"Exception occured: {ex.Message}");
             return new ConductorResponse
             {
                 IsSuccess = false,
@@ -43,25 +33,6 @@ public class ConductorService : IConductorService
                 Content = $"{{\"error\": \"Conductor service error: {ex.Message}\"}}"
             };
         }
-    }
-
-    private HttpRequestMessage CreateHttpRequest(ConductorRequest request)
-    {
-        var url = $"{_config.BaseUrl}/api/{request.Service}/{request.Endpoint.TrimStart('/')}";
-        var httpRequest = new HttpRequestMessage(request.Method, url);
-        
-        if (request.Data is not null)
-        {
-            var json = JsonSerializer.Serialize(request.Data, _jsonOptions);
-            httpRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
-        }
-        
-        foreach (var header in request.Headers)
-        {
-            httpRequest.Headers.Add(header.Key, header.Value);
-        }
-        
-        return httpRequest;
     }
 
     private async Task<ConductorResponse> CreateConductorResponse(HttpResponseMessage response)

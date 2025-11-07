@@ -7,12 +7,12 @@ using WebBackend.Service.Extensions;
 
 namespace WebBackend.Service.Manager;
 
-public class AuthManager(
-    ILogger<AuthManager> logger,
-    IAuthService authService,
-    IGeneratorManager generatorManager,
-    ISessionStorage sessionStorage) : IAuthManager
-{
+    public class AuthManager(
+        ILogger<AuthManager> logger,
+        IAuthService authService,
+        IGeneratorManager generatorManager,
+        ISessionStorage sessionStorage) : IAuthManager
+    {
     public async Task<string> TryAuthenticate(LoginDto dto)
     {
         var tokens = await authService.LoginAsync(dto.ToAuthenticateDto());

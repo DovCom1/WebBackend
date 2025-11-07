@@ -96,7 +96,6 @@ public static class DependencyExtensions
         IConfiguration configuration)
     {
         return services
-            .Configure<ConductorConfig>(configuration.GetSection("Conductor"))
             .Configure<RequestDomains>(configuration.GetSection("RequestDomains"))
             .Configure<SecretKeys>(configuration.GetSection("SecretKeys"))
             .Configure<RedisConnection>(configuration.GetSection("RedisConnection"));

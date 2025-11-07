@@ -33,4 +33,23 @@ public class RequestFactory(IOptions<RequestDomains> options)
             Content = new StringContent(json, Encoding.UTF8, "application/json")
         };
     }
+
+    public HttpRequestMessage CreateHttpRequestAsync(ConductorRequest request)
+    {
+        var url = $"{_requestDomains.ConductorService}/api/{request.Service}/{request.Endpoint.TrimStart('/')}";
+        var httpRequest = new HttpRequestMessage(request.Method, url);
+
+        if (request.Data is not null)
+        {
+            var json = JsonSerializer.Serialize(request.Data);
+            httpRequest.Content = new StringContent(json, Encoding.UTF8, "application/json");
+        }
+
+        foreach (var header in request.Headers)
+        {
+            httpRequest.Headers.Add(header.Key, header.Value);
+        }
+
+        return httpRequest;
+    }
 }
