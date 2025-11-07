@@ -23,7 +23,7 @@ public static class DependencyExtensions
     {
         return services
             .AddConfiguration(configuration)
-            //.AddStorages(configuration)
+            .AddStorages(configuration)
             .AddServices()
             .AddManagers()
             .AddHttpClients()

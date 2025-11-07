@@ -3,25 +3,7 @@ using WebBackend.Model.Constants;
 using WebBackend.Model.Storage;
 
 namespace WebBackend.Service.Storage;
-
-public class RedisSessionStorage : ISessionStorage
-{
-    public async Task<bool> AddSession(string sessionId, string token)
-    {
-        return true;
-    }
-
-    public async Task<string?> GetToken(string sessionId)
-    {
-        return "token";
-    }
-
-    public async Task<bool> RemoveSession(string sessionId)
-    {
-        return true;
-    }
-}
-/*public class RedisSessionStorage(IConnectionMultiplexer multiplexer) : ISessionStorage
+public class RedisSessionStorage(IConnectionMultiplexer multiplexer) : ISessionStorage
 {
     private readonly IDatabase _database = multiplexer.GetDatabase();
     public async Task<bool> AddSession(string sessionId, string token)
@@ -38,4 +20,4 @@ public class RedisSessionStorage : ISessionStorage
     {
         return await _database.KeyDeleteAsync(sessionId);
     }
-}*/
+}
