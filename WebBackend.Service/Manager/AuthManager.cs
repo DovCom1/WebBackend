@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using WebBackend.Model.Dto;
 using WebBackend.Model.Manager;
 using WebBackend.Model.Service;
@@ -7,28 +8,31 @@ using WebBackend.Service.Extensions;
 namespace WebBackend.Service.Manager;
 
 public class AuthManager(
+    ILogger<AuthManager> logger,
     IAuthService authService,
-    IGeneratorService generatorService,
+    IGeneratorManager generatorManager,
     ISessionStorage sessionStorage) : IAuthManager
 {
-    private readonly IAuthService _authService = authService;
-    private readonly IGeneratorService _generatorService = generatorService;
-    private readonly ISessionStorage _sessionStorage = sessionStorage;
     public async Task<string> TryAuthenticate(LoginDto dto)
     {
-        var tokens = await _authService.LoginAsync(dto.ToAuthenticateDto());
-        var sid = _generatorService.GenerateSid();
-        await _sessionStorage.AddSession(sid, tokens!.Token);
+        var tokens = await authService.LoginAsync(dto.ToAuthenticateDto());
+        var sid = generatorManager.GenerateSid();
+        if (tokens.Token == null)
+        {
+            logger.LogError("Not Access Token");
+            throw new Exception("Not Access Token");
+        }
+        var status = await sessionStorage.AddSession(sid, tokens.Token);
+        if (!status)
+        {
+            logger.LogError("Failed to write access token");
+            throw new Exception("Failed to write access token");
+        }
         return sid;
     }
 
     public async Task<bool> TryRegister(RegisterDto dto)
     {
-        return await _authService.RegisterAsync(dto.ToAuthenticateDto());
-    }
-
-    public string CreateWebToken()
-    {
-        return _generatorService.GenerateWebToken();
+        return await authService.RegisterAsync(dto.ToAuthenticateDto());
     }
 }

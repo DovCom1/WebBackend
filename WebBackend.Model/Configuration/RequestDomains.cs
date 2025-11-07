@@ -1,4 +1,4 @@
-namespace WebBackend.Model.Request;
+namespace WebBackend.Model.Configuration;
 
 public class RequestDomains
 {

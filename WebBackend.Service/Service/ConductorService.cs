@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Options;
-using WebBackend.Model.Configs;
+using WebBackend.Model.Configuration;
 using WebBackend.Model.Request;
 using WebBackend.Model.Service;
 
