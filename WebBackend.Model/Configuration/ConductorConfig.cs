@@ -1,4 +1,4 @@
-﻿namespace WebBackend.Model.Configs;
+﻿namespace WebBackend.Model.Configuration;
 
 public class ConductorConfig
 {

@@ -20,13 +20,10 @@ public static class DependencyExtensions
         IConfiguration configuration,
         IWebHostEnvironment environment)
     {
-        var connectionString = configuration["RedisConnection:ConnectionString"]
-                               ?? throw new NullReferenceException("No connection string cache");
-        var connectionPassword = configuration["RedisConnection:Password"]
-                                 ?? throw new NullReferenceException("No connection password");
+
         return services
             .AddOptions(configuration)
-            .AddStorages(connectionString, connectionPassword)
+            .AddStorages(configuration)
             .AddServices()
             .AddManagers()
             .AddCorsConfiguration()
@@ -39,14 +36,18 @@ public static class DependencyExtensions
     private static IServiceCollection AddServices(this IServiceCollection services)
     {
         return services.AddSingleton<IAuthService, AuthService>()
-            .AddSingleton<IGeneratorService, GeneratorService>();
+            .AddSingleton<IGeneratorManager, GeneratorManager>()
+            .AddScoped<IConductorService, ConductorService>();
     }
 
     private static IServiceCollection AddStorages(
-        this IServiceCollection services,
-        string connectionString,
-        string connectionPassword)
+        this IServiceCollection services, 
+        IConfiguration configuration)
     {
+        var connectionString = configuration["RedisConnection:ConnectionString"]
+                               ?? throw new NullReferenceException("No connection string cache");
+        var connectionPassword = configuration["RedisConnection:Password"]
+                                 ?? throw new NullReferenceException("No connection password");
         return services
             .AddSingleton<IConnectionMultiplexer>(_ =>
             {
@@ -69,10 +70,9 @@ public static class DependencyExtensions
 
     private static IServiceCollection AddHttpClientFactory(this IServiceCollection services)
     {
-        services
+        return services
             .AddSingleton<RequestFactory, RequestFactory>()
             .AddHttpClient();
-        return services;
     }
 
     private static IServiceCollection AddCorsConfiguration(this IServiceCollection services)
@@ -96,6 +96,7 @@ public static class DependencyExtensions
         IConfiguration configuration)
     {
         return services
+            .Configure<ConductorConfig>(configuration.GetSection("Conductor"))
             .Configure<RequestDomains>(configuration.GetSection("RequestDomains"))
             .Configure<SecretKeys>(configuration.GetSection("SecretKeys"))
             .Configure<RedisConnection>(configuration.GetSection("RedisConnection"));

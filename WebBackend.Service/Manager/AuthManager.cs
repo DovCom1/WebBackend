@@ -10,13 +10,13 @@ namespace WebBackend.Service.Manager;
 public class AuthManager(
     ILogger<AuthManager> logger,
     IAuthService authService,
-    IGeneratorService generatorService,
+    IGeneratorManager generatorManager,
     ISessionStorage sessionStorage) : IAuthManager
 {
     public async Task<string> TryAuthenticate(LoginDto dto)
     {
         var tokens = await authService.LoginAsync(dto.ToAuthenticateDto());
-        var sid = generatorService.GenerateSid();
+        var sid = generatorManager.GenerateSid();
         if (tokens.Token == null)
         {
             logger.LogError("Not Access Token");

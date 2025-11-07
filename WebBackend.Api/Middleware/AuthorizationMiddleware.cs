@@ -63,7 +63,7 @@ public class AuthorizationMiddleware
         var sessionId = ExtractSessionId(context);
         if (!string.IsNullOrEmpty(sessionId))
         {
-            var token = await sessionStorage.GetToken(sessionId);
+            var token = await sessionStorage.GetAccessToken(sessionId);
             if (!string.IsNullOrEmpty(token))
             {
                 _logger.LogDebug("Found token for session {SessionId}", sessionId);

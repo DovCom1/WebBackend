@@ -1,15 +1,10 @@
-using WebBackend.Model.Service;
 using System.Security.Cryptography;
+using WebBackend.Model.Manager;
 
-namespace WebBackend.Service.Service;
+namespace WebBackend.Service.Manager;
 
-public class GeneratorService : IGeneratorService
+public class GeneratorManager : IGeneratorManager
 {
-    public string GenerateWebToken()
-    {
-        return GenerateSid();
-    }
-
     public string GenerateSid()
     {
         var bytes = RandomNumberGenerator.GetBytes(32);

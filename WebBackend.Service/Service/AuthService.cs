@@ -6,7 +6,10 @@ using WebBackend.Model.Service;
 
 namespace WebBackend.Service.Service;
 
-public class AuthService(IHttpClientFactory clientFactory, RequestFactory requestFactory, ILogger<AuthService> logger) : IAuthService
+public class AuthService(
+    IHttpClientFactory clientFactory, 
+    RequestFactory requestFactory, 
+    ILogger<AuthService> logger) : IAuthService
 {
     public async Task<AuthTokenDto?> LoginAsync(AuthenticateDto dto)
     {
