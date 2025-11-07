@@ -1,3 +1,5 @@
+using WebBackend.Model.Constants;
+
 namespace WebBackend.Api.Service;
 
 public static class CookieCreator
@@ -11,6 +13,6 @@ public static class CookieCreator
             SameSite = SameSiteMode.Lax,
             Expires = DateTime.Now.AddYears(1)
         };
-        response.Cookies.Append("dovcom-sid", sid, cookieOptions);
+        response.Cookies.Append(Constants.SidName, sid, cookieOptions);
     }
 }
