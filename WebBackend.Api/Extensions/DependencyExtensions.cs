@@ -1,4 +1,6 @@
 using StackExchange.Redis;
+using WebBackend.Api.Handlers;
+using WebBackend.Api.Options;
 using WebBackend.Model.Configuration;
 using WebBackend.Model.Manager;
 using WebBackend.Model.Service;
@@ -15,7 +17,8 @@ public static class DependencyExtensions
 {
     public static IServiceCollection AddInfrastructure(
         this IServiceCollection services,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IWebHostEnvironment environment)
     {
         var connectionString = configuration["RedisConnection:ConnectionString"]
                                ?? throw new NullReferenceException("No connection string cache");
@@ -26,8 +29,11 @@ public static class DependencyExtensions
             .AddStorages(connectionString, connectionPassword)
             .AddServices()
             .AddManagers()
-            .AddCorsConfiguration(configuration)
-            .AddHttpClientFactory();
+            .AddCorsConfiguration()
+            .AddHttpClientFactory()
+            .AddSwagger(environment)
+            .AddAuth()
+            .AddWebSockets();
     }
 
     private static IServiceCollection AddServices(this IServiceCollection services)
@@ -43,14 +49,15 @@ public static class DependencyExtensions
     {
         return services
             .AddSingleton<IConnectionMultiplexer>(_ =>
-        {
-            var options = ConfigurationOptions.Parse(connectionString);
-            if (!string.IsNullOrWhiteSpace(connectionString)) options.Password = connectionPassword;
-            options.AbortOnConnectFail = false;
-            return ConnectionMultiplexer.Connect(options);
-        })
-            .AddScoped<ISessionStorage, RedisSessionStorage>()
-            .AddSingleton<IWebTokenStorage, WebTokenStorage>();
+            {
+                var options = ConfigurationOptions.Parse(connectionString);
+                if (!string.IsNullOrWhiteSpace(connectionString)) options.Password = connectionPassword;
+                options.AbortOnConnectFail = false;
+                var mux = ConnectionMultiplexer.ConnectAsync(options).GetAwaiter().GetResult();
+                Console.WriteLine("ConnectionMultiplexer connect is: " + mux.IsConnected);
+                return mux;
+            })
+            .AddScoped<ISessionStorage, RedisSessionStorage>();
     }
 
     private static IServiceCollection AddManagers(this IServiceCollection services)
@@ -68,8 +75,7 @@ public static class DependencyExtensions
         return services;
     }
 
-    private static IServiceCollection AddCorsConfiguration(this IServiceCollection services,
-        IConfiguration configuration)
+    private static IServiceCollection AddCorsConfiguration(this IServiceCollection services)
     {
         services.AddCors(options =>
         {
@@ -93,5 +99,38 @@ public static class DependencyExtensions
             .Configure<RequestDomains>(configuration.GetSection("RequestDomains"))
             .Configure<SecretKeys>(configuration.GetSection("SecretKeys"))
             .Configure<RedisConnection>(configuration.GetSection("RedisConnection"));
+    }
+
+    private static IServiceCollection AddSwagger(
+        this IServiceCollection services,
+        IWebHostEnvironment env)
+    {
+        if (env.IsDevelopment())
+        {
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen();
+        }
+
+        return services;
+    }
+
+    private static IServiceCollection AddAuth(
+        this IServiceCollection services)
+    {
+        services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = "TokenScheme";
+                options.DefaultChallengeScheme = "TokenScheme";
+            })
+            .AddScheme<TokenAuthOptions, TokenAuthHandler>("TokenScheme", options => { });
+        services.AddAuthorization();
+        return services;
+    }
+
+    private static IServiceCollection AddWebSockets(
+        this IServiceCollection services)
+    {
+        services.AddSignalR();
+        return services;
     }
 }

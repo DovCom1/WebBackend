@@ -10,7 +10,7 @@ namespace WebBackend.Service.Manager;
 
 public class TokenManager(IOptions<SecretKeys> options) : ITokenManager
 {
-    private readonly JwtSecurityTokenHandler _handler = new JwtSecurityTokenHandler();
+    private readonly JwtSecurityTokenHandler _handler = new();
     private readonly string _signingKey = options.Value.TokenSecretKey;
     public ClaimsPrincipal GetPrincipal(string token)
     {
