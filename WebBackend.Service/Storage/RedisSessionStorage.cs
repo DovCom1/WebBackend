@@ -3,7 +3,6 @@ using WebBackend.Model.Constants;
 using WebBackend.Model.Storage;
 
 namespace WebBackend.Service.Storage;
-
 public class RedisSessionStorage(IConnectionMultiplexer multiplexer) : ISessionStorage
 {
     private readonly IDatabase _database = multiplexer.GetDatabase();
@@ -12,7 +11,7 @@ public class RedisSessionStorage(IConnectionMultiplexer multiplexer) : ISessionS
         return await _database.StringSetAsync(sessionId, token, RedisConstants.Ttl);
     }
 
-    public async Task<string?> GetSession(string sessionId)
+    public async Task<string?> GetToken(string sessionId)
     {
         return await _database.StringGetAsync(sessionId);
     }
