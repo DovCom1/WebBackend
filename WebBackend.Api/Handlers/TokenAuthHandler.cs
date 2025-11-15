@@ -2,6 +2,7 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using WebBackend.Api.Options;
+using WebBackend.Model.Constants;
 using WebBackend.Model.Manager;
 using WebBackend.Model.Storage;
 
@@ -26,7 +27,7 @@ public class TokenAuthHandler : AuthenticationHandler<TokenAuthOptions>
     }
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
-        Request.Cookies.TryGetValue("dovcom-sid", out var sid);
+        Request.Cookies.TryGetValue(Constants.SidName, out var sid);
         if (sid == null)
         {
             Logger.LogWarning("No sid in cookies");

@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using WebBackend.Model.Request;
-using WebBackend.Model.Service;
+using WebBackend.Model.Manager;
 
 namespace WebBackend.Api.Controllers;
 
@@ -8,11 +7,11 @@ namespace WebBackend.Api.Controllers;
 [Route("api/[controller]")]
 public class ProxyController : ControllerBase
 {
-    private readonly IConductorService _conductorService;
+    private readonly IConductorManager _conductorManager;
 
-    public ProxyController(IConductorService conductorService)
+    public ProxyController(IConductorManager conductorManager)
     {
-        _conductorService = conductorService;
+        _conductorManager = conductorManager;
     }
 
     [HttpPost("{service}/{*endpoint}")]
@@ -47,15 +46,7 @@ public class ProxyController : ControllerBase
 
     private async Task<IActionResult> HandleProxyRequest(HttpMethod method, string service, string endpoint, object? data = null)
     {
-        var request = new ConductorRequest
-        {
-            Method = method,
-            Service = service,
-            Endpoint = endpoint,
-            Data = data
-        };
-
-        var response = await _conductorService.SendAsync(request);
+        var response = await _conductorManager.SendProxyRequestAsync(method, service, endpoint, data);
 
         return response.IsSuccess
             ? Content(response.Content, "application/json")
