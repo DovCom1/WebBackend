@@ -40,7 +40,7 @@ namespace WebBackend.Service.Manager;
             return false;
         }
         var response = await conductorManager.SendProxyRequestAsync(HttpMethod.Post, "users", "register", dto);
-        if (response.IsSuccess)
+        if (!response.IsSuccess)
         {
             return false;
         }
