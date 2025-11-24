@@ -11,6 +11,7 @@ namespace WebBackend.Service.Manager;
         ILogger<AuthManager> logger,
         IAuthService authService,
         IGeneratorManager generatorManager,
+        IConductorManager conductorManager,
         ISessionStorage sessionStorage) : IAuthManager
     {
     public async Task<string> TryAuthenticate(LoginDto dto)
@@ -33,6 +34,16 @@ namespace WebBackend.Service.Manager;
 
     public async Task<bool> TryRegister(RegisterDto dto)
     {
-        return await authService.RegisterAsync(dto.ToAuthenticateDto());
+        var status = await authService.RegisterAsync(dto.ToAuthenticateDto());
+        if (!status)
+        {
+            return false;
+        }
+        var response = await conductorManager.SendProxyRequestAsync(HttpMethod.Post, "users", "register", dto);
+        if (response.IsSuccess)
+        {
+            return false;
+        }
+        return true;
     }
 }
