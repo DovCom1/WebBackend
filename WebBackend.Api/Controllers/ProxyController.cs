@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using WebBackend.Model.Manager;
 
 namespace WebBackend.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize(AuthenticationSchemes = "TokenScheme")]
 public class ProxyController : ControllerBase
 {
     private readonly IConductorManager _conductorManager;

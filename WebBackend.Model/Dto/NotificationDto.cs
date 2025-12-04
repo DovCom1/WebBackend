@@ -1,4 +1,4 @@
 ﻿namespace WebBackend.Model.Dto
 {
-    public record NotificationDto(string Message);
+    public record NotificationDto(string chatId, string Message);
 }

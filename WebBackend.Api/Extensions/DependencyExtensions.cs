@@ -96,7 +96,16 @@ public static class DependencyExtensions
         IConfiguration configuration)
     {
         return services
-            .Configure<RequestDomains>(configuration.GetSection("RequestDomains"))
+            .Configure<RequestDomains>(options =>
+            {
+                options.AuthService = configuration["RequestDomains__AuthService"] 
+                ?? configuration["RequestDomains:AuthService"] 
+                ?? "http://auth_service:7070";
+
+                options.ConductorService = configuration["RequestDomains__ConductorService"] 
+                ?? configuration["RequestDomains:ConductorService"] 
+                ?? "http://conductor_service:7071";
+            })
             .Configure<SecretKeys>(configuration.GetSection("SecretKeys"))
             .Configure<RedisConnection>(configuration.GetSection("RedisConnection"));
     }

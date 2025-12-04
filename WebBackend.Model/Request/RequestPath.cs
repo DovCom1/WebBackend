@@ -6,5 +6,5 @@ public class RequestPath
 
     public static string RegisterUrl { get; set; } = "/register";
 
-    public static string CallOfferUrl { get; set; } = "/offer";
+    public static string CallSignalUrl { get; set; } = "/signal";
 }

@@ -33,7 +33,7 @@ public class TokenAuthHandler : AuthenticationHandler<TokenAuthOptions>
             Logger.LogWarning("No sid in cookies");
             return AuthenticateResult.NoResult();
         }
-            
+
         var accessToken = await _sessionStorage.GetAccessToken(sid);
         if (accessToken == null)
         {
