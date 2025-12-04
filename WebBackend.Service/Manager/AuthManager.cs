@@ -11,7 +11,8 @@ namespace WebBackend.Service.Manager;
         ILogger<AuthManager> logger,
         IAuthService authService,
         IGeneratorManager generatorManager,
-        ISessionStorage sessionStorage) : IAuthManager
+        ISessionStorage sessionStorage
+        ) : IAuthManager
     {
     public async Task<string> TryAuthenticate(LoginDto dto)
     {

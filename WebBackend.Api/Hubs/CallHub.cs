@@ -17,45 +17,26 @@ namespace WebBackend.Api.Hubs
             _logger = logger;
         }
 
+        public override async Task OnConnectedAsync()
+        {
+            _logger.LogInformation("User connected by ConnectionId: {ConnectionId}", Context.ConnectionId);
+            await base.OnConnectedAsync();
+        }
+
         public async Task Connect(string userId)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, $"{userId}");
             _logger.LogInformation($"Connection {Context.ConnectionId} joined {userId}");
         }
 
-        public async Task SendCallOffer(SignalDto offer)
+        public async Task SendCallSignal(SignalingMessageDto signalDto)
         {
-            if (string.IsNullOrEmpty(offer.ToUserId) || string.IsNullOrEmpty(offer.FromUserId))
-                throw new HubException("Invalid offer data");
+            var responce = await _conductorManager.SendSignalRequestAsync(signalDto);
 
-            var responce = await _conductorManager.SendSignalRequestAsync(offer);
-
-            _logger.LogInformation($"Offer from {offer.FromUserId} to {offer.ToUserId} forwarded to Conductor");
+            _logger.LogInformation($"Message from {signalDto.From} to {signalDto.To} forwarded to Conductor");
 
             if (!responce.IsSuccess)
                 _logger.LogWarning($"Responce from Conductor is not successfull");
-        }
-
-        public async Task SendCallAnswer(SignalDto answer)
-        {
-            if (string.IsNullOrEmpty(answer.ToUserId) || string.IsNullOrEmpty(answer.FromUserId))
-                throw new HubException("Invalid answer data");
-
-            await Clients.Group($"{answer.ToUserId}")
-                .SendAsync("ReceiveCallAnswer", answer);
-
-            _logger.LogInformation($"Answer from {answer.FromUserId} sent to {answer.ToUserId} via Hub");
-        }
-
-        public async Task SendIceCandidate(CallIceCandidateDto candidate)
-        {
-            if (string.IsNullOrEmpty(candidate.ToUserId) || string.IsNullOrEmpty(candidate.FromUserId))
-                throw new HubException("Invalid ICE candidate data");
-
-            await Clients.Group($"{candidate.ToUserId}")
-                .SendAsync("ReceiveIceCandidate", candidate);
-
-            _logger.LogInformation($"ICE candidate from {candidate.FromUserId} sent to {candidate.ToUserId}");
         }
     }
 }

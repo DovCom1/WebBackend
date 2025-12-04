@@ -29,7 +29,7 @@ namespace WebBackend.Service.Manager
             {
                 Method = HttpMethod.Post,
                 Service = Constants.CallsServiceName,
-                Endpoint = RequestPath.CallOfferUrl,
+                Endpoint = RequestPath.CallSignalUrl,
                 Data = data
             };
 

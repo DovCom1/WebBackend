@@ -1,9 +1,4 @@
-﻿using System.Net.Http;
-using System.Text;
-using System.Text.Json;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using WebBackend.Model.Configuration;
+﻿using Microsoft.Extensions.Logging;
 using WebBackend.Model.Request;
 using WebBackend.Model.Service;
 
