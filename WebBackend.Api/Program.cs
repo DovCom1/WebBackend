@@ -18,7 +18,6 @@ if (app.Environment.IsDevelopment())
 }
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseAuthorizationMiddleware();
 
 app.MapControllers();
 app.Run();

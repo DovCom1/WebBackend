@@ -24,6 +24,7 @@ namespace WebBackend.Service.Manager;
             throw new Exception("Not Access Token");
         }
         var status = await sessionStorage.AddSession(sid, tokens.Token);
+        await sessionStorage.AddUserId(tokens.UserId.ToString(), sid);
         if (!status)
         {
             logger.LogError("Failed to write access token");
