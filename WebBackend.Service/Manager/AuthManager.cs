@@ -11,8 +11,8 @@ namespace WebBackend.Service.Manager;
         ILogger<AuthManager> logger,
         IAuthService authService,
         IGeneratorManager generatorManager,
-        ISessionStorage sessionStorage
-        ) : IAuthManager
+        IConductorManager conductorManager,
+        ISessionStorage sessionStorage) : IAuthManager
     {
     public async Task<string> TryAuthenticate(LoginDto dto)
     {
@@ -24,6 +24,7 @@ namespace WebBackend.Service.Manager;
             throw new Exception("Not Access Token");
         }
         var status = await sessionStorage.AddSession(sid, tokens.Token);
+        await sessionStorage.AddUserId(tokens.UserId.ToString(), sid);
         if (!status)
         {
             logger.LogError("Failed to write access token");
@@ -34,6 +35,16 @@ namespace WebBackend.Service.Manager;
 
     public async Task<bool> TryRegister(RegisterDto dto)
     {
-        return await authService.RegisterAsync(dto.ToAuthenticateDto());
+        var status = await authService.RegisterAsync(dto.ToAuthenticateDto());
+        if (!status)
+        {
+            return false;
+        }
+        var response = await conductorManager.SendProxyRequestAsync(HttpMethod.Post, "users", "register", dto);
+        if (!response.IsSuccess)
+        {
+            return false;
+        }
+        return true;
     }
 }
