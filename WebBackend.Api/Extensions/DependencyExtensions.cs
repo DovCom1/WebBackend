@@ -101,13 +101,11 @@ public static class DependencyExtensions
         return services
             .Configure<RequestDomains>(options =>
             {
-                options.AuthService = configuration["RequestDomains__AuthService"] 
-                ?? configuration["RequestDomains:AuthService"] 
-                ?? "http://auth_service:7070";
+                options.AuthService = configuration["RequestDomains:AuthService"] 
+                                      ?? throw new NullReferenceException("No auth service name");
 
-                options.ConductorService = configuration["RequestDomains__ConductorService"] 
-                ?? configuration["RequestDomains:ConductorService"] 
-                ?? "http://conductor_service:7071";
+                options.ConductorService = configuration["RequestDomains:ConductorService"] 
+                                      ?? throw new NullReferenceException("No conductor service name");
             })
             .Configure<SecretKeys>(configuration.GetSection("SecretKeys"))
             .Configure<RedisConnection>(configuration.GetSection("RedisConnection"));
