@@ -26,7 +26,7 @@ public static class DependencyExtensions
             .AddStorages(configuration)
             .AddServices()
             .AddManagers()
-            .AddCorsConfiguration()
+            .AddCorsConfiguration(configuration)
             .AddHttpClientFactory()
             .AddSwagger(environment)
             .AddAuth()
@@ -76,12 +76,14 @@ public static class DependencyExtensions
             .AddHttpClient();
     }
 
-    private static IServiceCollection AddCorsConfiguration(this IServiceCollection services)
+    private static IServiceCollection AddCorsConfiguration(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddCors(options =>
         {
             options.AddPolicy("frontend", p => p
-                .WithOrigins("http://localhost:3000")
+                .WithOrigins(configuration["Cors:Frontend"] ?? throw new NullReferenceException("CORS Frontend URL"))
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials()
