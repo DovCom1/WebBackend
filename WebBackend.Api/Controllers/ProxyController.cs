@@ -17,7 +17,7 @@ public class ProxyController : ControllerBase
     }
 
     [HttpPost("{service}/{*endpoint}")]
-    public async Task<IActionResult> PostProxy(string service, string endpoint, [FromBody] object data)
+    public async Task<IActionResult> PostProxy(string service, string endpoint, [FromBody] object? data)
     {
         return await HandleProxyRequest(HttpMethod.Post, service, $"{endpoint}{Request.QueryString}", data);
     }

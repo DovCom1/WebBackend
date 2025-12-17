@@ -34,6 +34,17 @@ public class RequestFactory(IOptions<RequestDomains> options)
         };
     }
 
+    public HttpRequestMessage CreatePutIdRequest(UserIdDto dto)
+    {
+        var json = JsonSerializer.Serialize(dto);
+        Console.WriteLine("json is: " + json);
+        return new HttpRequestMessage(
+            HttpMethod.Put,
+            _requestDomains.AuthService + RequestPath.RegisterUrl)
+        {
+            Content = new StringContent(json, Encoding.UTF8, "application/json")
+        };
+    }
     public HttpRequestMessage CreateHttpRequestAsync(ConductorRequest request)
     {
         var url = $"{_requestDomains.ConductorService}/api/{request.Service}/{request.Endpoint.TrimStart('/')}";

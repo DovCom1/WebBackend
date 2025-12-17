@@ -65,7 +65,8 @@ public static class DependencyExtensions
     {
         return services
             .AddScoped<IAuthManager, AuthManager>()
-            .AddScoped<ITokenManager, TokenManager>();
+            .AddScoped<ITokenManager, TokenManager>()
+            .AddScoped<IConductorManager, ConductorManager>();
     }
 
     private static IServiceCollection AddHttpClientFactory(this IServiceCollection services)
