@@ -40,4 +40,11 @@ public class AuthService(
         var response = await client.SendAsync(requestFactory.CreateRegisterRequest(dto));
         return response.IsSuccessStatusCode;
     }
+
+    public async Task<bool> PutIdAsync(UserIdDto dto)
+    {
+        var client = clientFactory.CreateClient();
+        var response = await client.SendAsync(requestFactory.CreatePutIdRequest(dto));
+        return response.IsSuccessStatusCode;
+    }
 }

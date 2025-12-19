@@ -19,7 +19,6 @@ if (app.Environment.IsDevelopment())
 }
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseAuthorizationMiddleware();
 
 app.MapHub<UserHub>("/user/hub");
 app.MapHub<CallHub>("/call/hub");

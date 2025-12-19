@@ -7,4 +7,5 @@ public interface IAuthService
     Task<AuthTokenDto?> LoginAsync(AuthenticateDto dto);
     
     Task<bool> RegisterAsync(AuthenticateDto dto);
+    Task<bool> PutIdAsync(UserIdDto dto);
 }

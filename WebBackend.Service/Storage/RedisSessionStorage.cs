@@ -26,12 +26,12 @@ public class RedisSessionStorage(IConnectionMultiplexer multiplexer) : ISessionS
 
     public async Task<string?> GetAccessToken(string sessionId)
     {
-        return await _database.StringGetAsync(sessionId);
+        return await _database.StringGetAsync(SessionSetKey(sessionId));
     }
 
     public async Task<bool> RemoveSession(string sessionId)
     {
-        return await _database.KeyDeleteAsync(sessionId);
+        return await _database.KeyDeleteAsync(SessionSetKey(sessionId));
     }
 
     private string UserSetkey(string userId) => $"user:{userId}";

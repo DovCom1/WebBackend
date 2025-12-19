@@ -26,7 +26,7 @@ public static class DependencyExtensions
             .AddStorages(configuration)
             .AddServices()
             .AddManagers()
-            .AddCorsConfiguration()
+            .AddCorsConfiguration(configuration)
             .AddHttpClientFactory()
             .AddSwagger(environment)
             .AddAuth()
@@ -65,7 +65,8 @@ public static class DependencyExtensions
     {
         return services
             .AddScoped<IAuthManager, AuthManager>()
-            .AddScoped<ITokenManager, TokenManager>();
+            .AddScoped<ITokenManager, TokenManager>()
+            .AddScoped<IConductorManager, ConductorManager>();
     }
 
     private static IServiceCollection AddHttpClientFactory(this IServiceCollection services)
@@ -75,12 +76,14 @@ public static class DependencyExtensions
             .AddHttpClient();
     }
 
-    private static IServiceCollection AddCorsConfiguration(this IServiceCollection services)
+    private static IServiceCollection AddCorsConfiguration(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
         services.AddCors(options =>
         {
             options.AddPolicy("frontend", p => p
-                .WithOrigins("http://localhost:3000")
+                .WithOrigins(configuration["Cors:Frontend"] ?? throw new NullReferenceException("CORS Frontend URL"))
                 .AllowAnyHeader()
                 .AllowAnyMethod()
                 .AllowCredentials()
@@ -98,13 +101,11 @@ public static class DependencyExtensions
         return services
             .Configure<RequestDomains>(options =>
             {
-                options.AuthService = configuration["RequestDomains__AuthService"] 
-                ?? configuration["RequestDomains:AuthService"] 
-                ?? "http://auth_service:7070";
+                options.AuthService = configuration["RequestDomains:AuthService"] 
+                                      ?? throw new NullReferenceException("No auth service name");
 
-                options.ConductorService = configuration["RequestDomains__ConductorService"] 
-                ?? configuration["RequestDomains:ConductorService"] 
-                ?? "http://conductor_service:7071";
+                options.ConductorService = configuration["RequestDomains:ConductorService"] 
+                                      ?? throw new NullReferenceException("No conductor service name");
             })
             .Configure<SecretKeys>(configuration.GetSection("SecretKeys"))
             .Configure<RedisConnection>(configuration.GetSection("RedisConnection"));

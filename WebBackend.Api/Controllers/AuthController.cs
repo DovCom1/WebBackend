@@ -15,9 +15,9 @@ public class AuthController(
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginDto dto)
     {
-        var sid = await authManager.TryAuthenticate(dto);
+        var (sid, id) = await authManager.TryAuthenticate(dto);
         CookieCreator.AddSidToCookie(sid, Response);
-        return Ok();
+        return Ok(id);
     }
 
     [HttpPost("register")]
