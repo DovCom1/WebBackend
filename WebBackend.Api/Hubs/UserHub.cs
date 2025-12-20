@@ -17,9 +17,9 @@ public class UserHub : Hub
         _logger.LogInformation("User connected by ConnectionId: {ConnectionId}", Context.ConnectionId);
         await base.OnConnectedAsync();
     }
-    public async Task Connect(int chatId)
+    public async Task Connect(string userId)
     {
-        await Groups.AddToGroupAsync(Context.ConnectionId, $"{chatId}");
-        _logger.LogInformation($"Connection {Context.ConnectionId} joined {chatId}");
+        await Groups.AddToGroupAsync(Context.ConnectionId, $"{userId}");
+        _logger.LogInformation($"Connection {Context.ConnectionId} joined {userId}");
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WebBackend.Api.Service;
+using WebBackend.Model.Constants;
 using WebBackend.Model.Dto;
 using WebBackend.Model.Manager;
 
@@ -28,5 +29,16 @@ public class AuthController(
             return Created();
         }
         return BadRequest();
+    }
+
+    [HttpGet("me")]
+    public async Task<IActionResult> LoginToSid()
+    {
+        var userId = await authManager.TryAuthToSid(Request);
+        if (userId != null)
+        {
+            return Ok(userId);
+        }
+        return Unauthorized();
     }
 }

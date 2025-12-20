@@ -1,5 +1,7 @@
 using System.Text.Json;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using WebBackend.Model.Constants;
 using WebBackend.Model.Dto;
 using WebBackend.Model.Manager;
 using WebBackend.Model.Service;
@@ -24,11 +26,22 @@ namespace WebBackend.Service.Manager;
             logger.LogError("Not Access Token");
             throw new Exception("Not Access Token");
         }
-        var status = await sessionStorage.AddSession(sid, tokens.Token);
-        await sessionStorage.AddUserId(tokens.UserId.ToString(), sid);
+        var status = await sessionStorage.AddSession(sid, tokens.Token) ;
         if (!status)
         {
             logger.LogError("Failed to write access token");
+            throw new Exception("Failed to write access token");
+        }
+        status = await sessionStorage.AddSessionToUserId(sid, tokens.UserId);
+        if (!status)
+        {
+            logger.LogError("Failed to write user id");
+            throw new Exception("Failed to write access token");
+        }
+        await sessionStorage.AddUserId(tokens.UserId, sid);
+        if (!status)
+        {
+            logger.LogError("Failed to write sid");
             throw new Exception("Failed to write access token");
         }
         return (sid, tokens.UserId);
@@ -59,5 +72,15 @@ namespace WebBackend.Service.Manager;
             return false;
         }
         return true;
+    }
+
+    public async Task<string?> TryAuthToSid(HttpRequest request)
+    {
+        if (request.Cookies.ContainsKey(Constants.SidName))
+        {
+            return await sessionStorage.GetUserIdBySession(request.Cookies[Constants.SidName]);
+        }
+
+        return null;
     }
 }
