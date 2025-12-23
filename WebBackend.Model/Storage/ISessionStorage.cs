@@ -8,4 +8,6 @@ public interface ISessionStorage
     Task<List<string>> GetUserIds(string userId);
     Task<bool> AddSessionToUserId(string sessionId, string userId);
     Task<string?> GetUserIdBySession(string session);
+    Task<bool> AddConnection(string connectionId);
+    Task<bool> RemoveConnection(string connectionId);
 }

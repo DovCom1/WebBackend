@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json.Linq;
 using WebBackend.Api.Hubs;
-using WebBackend.Model.Dto;
 
 namespace WebBackend.Api.Controllers
 {
@@ -15,24 +15,32 @@ namespace WebBackend.Api.Controllers
     {
         [AllowAnonymous]
         [HttpPost("send")]
-        public async Task<IActionResult> SendNotification([FromBody] NotificationDto dto)
+        public async Task<IActionResult> SendNotification([FromBody] Dictionary<string, string> dto)
         {
-            if (!ModelState.IsValid)
+            logger.LogInformation($"DTO IS {dto.ToString()}");
+            var type = dto["TypeDto"]?.ToString();
+            var receiverId = dto["ReceiverId"]?.ToString();
+            if (type == null || receiverId == null)
             {
-                // Логируем все ошибки
-                var errors = ModelState
-                    .Where(e => e.Value.Errors.Count > 0)
-                    .Select(e => new {
-                        Field = e.Key,
-                        Errors = e.Value.Errors.Select(err => err.ErrorMessage)
-                    });
-        
-                logger.LogError("Validation failed: {@Errors}", errors);
-                return BadRequest(ModelState);
+                logger.LogError($"Invalid notification type: {type}");
+                logger.LogError($"Invalid receiver id: {receiverId}");
+                return BadRequest("Invalid notification type or receiver id.");
             }
-            await hubContext.Clients.Group(dto.ReceiverId.ToString())
-                .SendAsync("ReceiveNotification", dto);
+            logger.LogInformation($"Get type: {type}");
+            logger.LogInformation($"Get receiver id: {receiverId}");
 
+            if (type == "SendMessage")
+            {
+                logger.LogInformation($"Sending notification to new message");
+                await hubContext.Clients.Group(receiverId)
+                    .SendAsync("ReceiveNotification", dto);
+            }
+            else if (type == "Invite")
+            {
+                logger.LogInformation($"Sending notification to new invite");
+                await hubContext.Clients.Group(receiverId)
+                    .SendAsync("Invite", dto);
+            }
             return Ok();
         }
     }

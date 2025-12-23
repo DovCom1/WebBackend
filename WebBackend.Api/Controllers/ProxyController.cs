@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using WebBackend.Model.Manager;
 
 namespace WebBackend.Api.Controllers;
@@ -41,7 +42,10 @@ public class ProxyController : ControllerBase
     }
 
     [HttpPatch("{service}/{*endpoint}")]
-    public async Task<IActionResult> PatchProxy(string service, string endpoint, [FromBody] object data)
+    public async Task<IActionResult> PatchProxy(
+        [FromRoute] string service, 
+        [FromRoute] string endpoint, 
+        [FromBody(EmptyBodyBehavior = EmptyBodyBehavior.Allow)] object? data = null)
     {
         return await HandleProxyRequest(HttpMethod.Patch, service, $"{endpoint}{Request.QueryString}", data);
     }
