@@ -12,6 +12,31 @@ public class RedisSessionStorage(IConnectionMultiplexer multiplexer) : ISessionS
         return await _database.StringSetAsync(SessionSetKey(sessionId), token, RedisConstants.Ttl);
     }
 
+    public async Task<bool> AddSessionToUserId(string sessionId, string userId)
+    {
+        return await _database.StringSetAsync(SessionToUserIdSetKey(sessionId), userId, RedisConstants.Ttl);
+    }
+
+    public async Task<string?> GetUserIdBySession(string session)
+    {
+        return await _database.StringGetAsync(SessionToUserIdSetKey(session));
+    }
+
+    public async Task<bool> AddConnection(string connectionId)
+    {
+        return await _database.StringSetAsync(ConnectionIdKey(connectionId), connectionId);
+    }
+
+    public async Task<string?> GetConnectionId(string connectionId)
+    {
+        return await _database.StringGetAsync(ConnectionIdKey(connectionId));
+    }
+
+    public async Task<bool> RemoveConnection(string connectionId)
+    {
+        return await _database.KeyDeleteAsync(ConnectionIdKey(connectionId));
+    }
+
     public async Task AddUserId(string userId, string sessionId)
     {
         await _database.ListRightPushAsync(UserSetkey(userId), sessionId);
@@ -37,4 +62,7 @@ public class RedisSessionStorage(IConnectionMultiplexer multiplexer) : ISessionS
     private string UserSetkey(string userId) => $"user:{userId}";
 
     private string SessionSetKey(string sessionId) => $"session:{sessionId}";
+    
+    private string SessionToUserIdSetKey(string sessionId) => $"sessionUserId:{sessionId}";
+    private string ConnectionIdKey(string connection) => $"connectionId:{connection}";
 }

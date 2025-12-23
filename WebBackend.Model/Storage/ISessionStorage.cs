@@ -6,4 +6,8 @@ public interface ISessionStorage
     Task<string?> GetAccessToken(string sessionId);
     Task AddUserId(string userId, string sessionId);
     Task<List<string>> GetUserIds(string userId);
+    Task<bool> AddSessionToUserId(string sessionId, string userId);
+    Task<string?> GetUserIdBySession(string session);
+    Task<bool> AddConnection(string connectionId);
+    Task<bool> RemoveConnection(string connectionId);
 }

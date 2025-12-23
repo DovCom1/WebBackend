@@ -31,14 +31,14 @@ public class TokenAuthHandler : AuthenticationHandler<TokenAuthOptions>
         if (sid == null)
         {
             Logger.LogWarning("No sid in cookies");
-            return AuthenticateResult.NoResult();
+            return AuthenticateResult.Fail("No sid in cookies");
         }
 
         var accessToken = await _sessionStorage.GetAccessToken(sid);
         if (accessToken == null)
         {
             Logger.LogWarning("Dont have access token in storage.");
-            return AuthenticateResult.NoResult();
+            return AuthenticateResult.Fail("Dont have access token in storage.");
         }
         var principal = _tokenManager.GetPrincipal(accessToken);
         var ticket = new AuthenticationTicket(principal, Scheme.Name);
